@@ -105,7 +105,15 @@ function calcDmg(effect, level, atk) {
 }
 
 function applyDef(raw, def) { return raw * (100 / (100 + def)); }
-
+const ELEMENT_ADVANTAGE = {
+  fire:["water"], water:["electric"], electric:["metal"],
+  metal:["light"], light:["psychic"], psychic:["metal"],
+};
+function elementMod(attackerEl, defenderEl) {
+  if (ELEMENT_ADVANTAGE[attackerEl]?.includes(defenderEl)) return 1.2;
+  if (ELEMENT_ADVANTAGE[defenderEl]?.includes(attackerEl)) return 0.8;
+  return 1.0;
+}
 // ─── EXP & LEVEL SYSTEM ─────────────────────────────────────────────────
 // EXP required per level: 100 + floor(level/10) × 10
 // Lv1→2: 100, Lv11→12: 110, Lv21→22: 120, etc.
@@ -189,7 +197,8 @@ export default function BattleScene() {
   const [lockedAlloc,  setLockedAlloc]  = useState({ atk:0, def:0, hp:0, aspd:0, critR:0, critD:0 });
   const [showStatAlloc, setShowStatAlloc] = useState(false);
   const [levelUpAnn,   setLevelUpAnn]   = useState("");
-
+  const [elementAffinity, setElementAffinity] = useState({ fire:0, water:0, electric:0, metal:0, psychic:0, light:0 });
+  
   const cubeStats   = calcStats(allocation);
   const cubeMaxHp   = cubeStats.hp;
   const cubeAtk     = cubeStats.atk;
@@ -367,7 +376,8 @@ export default function BattleScene() {
               if (eff.unit?.includes("% ATK") && !eff.is_defense && !eff.is_buff && !eff.is_debuff && !eff.is_heal && !eff.is_shield && eff.base_value > 0) {
                 targets.forEach(t => {
                   const raw   = calcDmg(eff, slot.level, cubeAtk);
-                  const fin   = applyDef(raw, t.def);
+const elMod = elementMod(cubeElement, t.element);
+const fin   = applyDef(raw * elMod, t.def);
                   const crit  = Math.random() < cubeCritR / 100;
                   const dealt = Math.round(crit ? fin * (1 + cubeCritD / 100) : fin);
                   updated = updated.map(e => e.id === t.id ? {...e, currentHp: Math.max(0, e.currentHp - dealt)} : e);
@@ -414,12 +424,14 @@ export default function BattleScene() {
             setCubeState("attack");
             setTimeout(() => setCubeState("idle"), 350);
 
-            setSkillSlots(ss => {
-              const n = [...ss];
-              const gain = RARITY_CONFIG[sk.rarity]?.affinity_gain || 0.2;
-              n[i] = {...n[i], affinity: Math.min(100, (n[i].affinity || 0) + gain)};
-              return n;
-            });
+            const gain = RARITY_CONFIG[sk.rarity]?.affinity_gain || 0.2;
+const skEl = sk.id.startsWith("fire") ? "fire"
+  : sk.id.startsWith("water") ? "water"
+  : sk.id.startsWith("elec") ? "electric"
+  : sk.id.startsWith("metal") ? "metal"
+  : sk.id.startsWith("psyc") ? "psychic"
+  : "light";
+setElementAffinity(ea => ({...ea, [skEl]: Math.min(100, (ea[skEl]||0) + gain)}));
 
             return updated;
           });
@@ -863,7 +875,6 @@ export default function BattleScene() {
                 const cdMax = calcCooldown(sk, slot.level);
                 const cdLeft = cooldowns[i];
                 const cdPct  = Math.max(0, 1 - cdLeft / cdMax);
-                const aff    = Math.min(100, slot.affinity || 0);
                 const dmgEff = sk.effects.find(e => e.unit?.includes("% ATK") && e.base_value > 0 && !e.is_defense);
                 const dmgVal = dmgEff ? ((dmgEff.base_value + dmgEff.scaling_per_level*(slot.level-1))*(dmgEff.hits||1)).toFixed(0) : null;
                 const statusEff = sk.effects.find(e => e.status);
@@ -898,21 +909,24 @@ export default function BattleScene() {
                     <div style={{height:3,background:"#0a0d14",border:"1px solid #1a2030",borderRadius:2,overflow:"hidden",marginBottom:6}}>
                       <div style={{height:"100%",width:`${cdPct*100}%`,background:elCfg.color,borderRadius:2,transition:"width 0.1s"}} />
                     </div>
-                    {/* Affinity */}
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                      <span style={{fontSize:7,color:"#1e3050",letterSpacing:1}}>AFFINITY</span>
-                      <span style={{fontSize:8,color: aff>=100 ? "#ffa726" : rCfg.color, fontWeight: aff>=100 ? "bold":"normal"}}>
-                        {aff>=100 ? "✦ MERGE READY" : `${aff.toFixed(1)} / 100`}
-                      </span>
-                    </div>
-                    <div style={{height:4,background:"#0a0d14",border:"1px solid #1a2030",borderRadius:2,overflow:"hidden"}}>
-                      <div style={{
-                        height:"100%", width:`${aff}%`,
-                        background: aff>=100 ? "linear-gradient(90deg, #ffa726, #ffd740)" : rCfg.color,
-                        boxShadow: aff>=100 ? "0 0 6px #ffa726" : "none",
-                        borderRadius:2, transition:"width 0.3s",
-                      }} />
-                    </div>
+                    {/* Affinity per element */}
+<div style={{fontSize:7,color:"#1e3050",letterSpacing:1,marginBottom:4}}>ELEMENT AFFINITY</div>
+<div style={{display:"flex",flexDirection:"column",gap:3}}>
+  {Object.entries(elementAffinity).map(([el, val]) => {
+    const eCfg = ELEMENT_CONFIG[el];
+    return (
+      <div key={el} style={{display:"flex",alignItems:"center",gap:5}}>
+        <span style={{fontSize:9,width:14}}>{eCfg.icon}</span>
+        <div style={{flex:1,height:4,background:"#0a0d14",border:"1px solid #1a2030",borderRadius:2,overflow:"hidden"}}>
+          <div style={{height:"100%",width:`${val}%`,background:eCfg.color,borderRadius:2,transition:"width 0.3s"}} />
+        </div>
+        <span style={{fontSize:7,color: val>=100 ? "#ffa726" : eCfg.color,width:28,textAlign:"right"}}>
+          {val>=100 ? "MAX" : val.toFixed(0)}
+        </span>
+      </div>
+    );
+  })}
+</div>
                     {/* Status unlock hint */}
                     {statusEff && statusEff.trigger === "unlock_level_5" && (
                       <div style={{fontSize:7,color:slot.level>=5?"#66bb6a":"#2a4060",marginTop:4}}>
