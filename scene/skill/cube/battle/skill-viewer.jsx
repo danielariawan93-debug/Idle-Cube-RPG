@@ -62,7 +62,20 @@ const SKILL_DATA = {
     { id: "psyc_utl_02", name: "Mind Shatter", type: "utility", rarity: "rare", target_count: "single", cooldown_base: 12, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "ATK debuff", base_value: -35, scaling_per_level: -2, unit: "% ATK reduction", duration_fixed: 6 }, { trigger: "always", description: "ASPD debuff", base_value: -20, scaling_per_level: -1.5, unit: "% ASPD reduction", duration_fixed: 6 }] },
     { id: "psyc_dmg_03", name: "Psychic Storm", type: "damage", rarity: "epic", target_count: "aoe", cooldown_base: 13, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "Psychic waves every 1s for 3s", base_value: 80, scaling_per_level: 5, unit: "% ATK per wave", hits: 3 }, { trigger: "per_wave", description: "Confuse chance per wave", base_value: 50, scaling_per_level: 2, unit: "% chance", status: "confuse", duration_fixed: 4 }] },
     { id: "psyc_utl_03", name: "Mind Domination", type: "utility", rarity: "epic", target_count: "single", cooldown_base: 14, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "Force attack allies (3s+0.125/lvl, solo=self)", base_value: 3, scaling_per_level: 0.125, unit: "sec domination" }, { trigger: "on_control_end", description: "ATK+DEF debuff after control ends", base_value: -30, scaling_per_level: -2, unit: "% ATK/DEF reduction", duration_fixed: 3 }] },
-    { id: "psyc_utl_04", name: "Psychic Collapse", type: "utility", rarity: "legendary", target_count: "single", cooldown_base: 20, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "ALL debuffs: -ATK/-DEF/-ASPD/Confuse/No Heal/No Ability", base_value: -40, scaling_per_level: -2, unit: "% ATK+DEF reduction", duration_fixed: 5 }, { trigger: "on_debuff_end", description: "Vulnerability window (all dmg amplified)", base_value: 50, scaling_per_level: 2, unit: "% dmg amplification", duration_fixed: 3 }] },
+    { id: "psyc_utl_04", name: "Psychic Collapse", type: "utility", rarity: "legendary", target_count: "single", cooldown_base: 20, cooldown_scaling: -0.1, effects: [
+      { trigger: "always", description: "Shatter enemy mind — apply ALL debuffs simultaneously", base_value: 0, scaling_per_level: 0, unit: "special",
+        duration_base: 5, duration_scaling: 0.25,
+        sub_effects: [
+          { label: "ATK Reduction",   base_value: -40, scaling_per_level: -2,   unit: "% ATK" },
+          { label: "DEF Reduction",   base_value: -40, scaling_per_level: -2,   unit: "% DEF" },
+          { label: "ASPD Reduction",  base_value: -30, scaling_per_level: -1.5, unit: "% ASPD" },
+          { label: "Confuse",         base_value: -25, scaling_per_level: 0,    unit: "% chance attack self", fixed: true },
+          { label: "No Heal",         base_value: 0,   scaling_per_level: 0,    unit: "block all healing",    special: true },
+          { label: "No Ability",      base_value: 0,   scaling_per_level: 0,    unit: "boss immune",          special: true },
+        ]
+      },
+      { trigger: "on_debuff_end", description: "Vulnerability window — all damage amplified", base_value: 50, scaling_per_level: 2, unit: "% dmg amplification", duration_fixed: 3 }
+    ] },
   ],
   light: [
     { id: "lght_dmg_01", name: "Holy Bolt", type: "damage", rarity: "common", target_count: "single", cooldown_base: 7, cooldown_scaling: -0.05, effects: [{ trigger: "always", description: "Holy light bolt", base_value: 120, scaling_per_level: 4, unit: "% ATK" }, { trigger: "unlock_level_5", description: "Blind chance", base_value: 10, scaling_per_level: 1, unit: "% chance", status: "blind", duration_fixed: 3 }] },
@@ -73,7 +86,21 @@ const SKILL_DATA = {
     { id: "lght_utl_02", name: "Blessing", type: "utility", rarity: "rare", target_count: "single", cooldown_base: 12, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "Heal self", base_value: 100, scaling_per_level: 5, unit: "% ATK as HP" }, { trigger: "always", description: "Recovery effect boost", base_value: 20, scaling_per_level: 1.5, unit: "% recovery boost", duration_fixed: 6 }] },
     { id: "lght_dmg_03", name: "Divine Judgment", type: "damage", rarity: "epic", target_count: "aoe", cooldown_base: 13, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "4 divine beams simultaneously", base_value: 70, scaling_per_level: 4, unit: "% ATK per beam", hits: 4 }, { trigger: "on_hit", description: "Gain shield = 50% total damage dealt", base_value: 50, scaling_per_level: 0, unit: "% dmg as shield", duration_fixed: 4 }] },
     { id: "lght_dmg_04", name: "Holy Guardian", type: "damage", rarity: "epic", target_count: "aoe", cooldown_base: 15, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "Summon Holy Guardian (AoE/sec for 6s+0.5/lvl)", base_value: 60, scaling_per_level: 3, unit: "% ATK/sec" }, { trigger: "per_guardian_hit", description: "Guardian heals Hero every 2s", base_value: 15, scaling_per_level: 2, unit: "% ATK/2s" }, { trigger: "per_guardian_hit", description: "Blind chance per hit", base_value: 50, scaling_per_level: 2, unit: "% chance", status: "blind", duration_fixed: 4 }] },
-    { id: "lght_utl_03", name: "Divine Ascension", type: "utility", rarity: "legendary", target_count: "single", cooldown_base: 20, cooldown_scaling: -0.1, effects: [{ trigger: "always", description: "Divine state (8s+0.5/lvl): +Light Dmg/Heal/DR/Debuff Immune/ASPD", base_value: 50, scaling_per_level: 3, unit: "% Light Dmg boost" }, { trigger: "on_state_end", description: "Holy explosion AoE + 100% Blind 5s", base_value: 200, scaling_per_level: 8, unit: "% ATK AoE" }] },
+    { id: "lght_utl_03", name: "Divine Ascension", type: "utility", rarity: "legendary", target_count: "single", cooldown_base: 20, cooldown_scaling: -0.1, effects: [
+      { trigger: "always", description: "Enter divine state — all buffs active for duration",
+        base_value: 0, scaling_per_level: 0, unit: "special",
+        duration_base: 8, duration_scaling: 0.5,
+        sub_effects: [
+          { label: "Light Damage Boost",       base_value: 50, scaling_per_level: 3, unit: "% Light Dmg" },
+          { label: "Other Element Dmg Boost",  base_value: 30, scaling_per_level: 2, unit: "% (non-DoT)" },
+          { label: "Healing Received Boost",   base_value: 50, scaling_per_level: 3, unit: "% Heal" },
+          { label: "Damage Reduction",         base_value: 35, scaling_per_level: 2, unit: "% DR" },
+          { label: "Debuff Immunity",          base_value: 0,  scaling_per_level: 0, unit: "immune all debuffs", special: true },
+          { label: "ASPD Boost",               base_value: 20, scaling_per_level: 1, unit: "% ASPD" },
+        ]
+      },
+      { trigger: "on_state_end", description: "Holy explosion AoE + Blind all enemies (guaranteed 5s)", base_value: 200, scaling_per_level: 8, unit: "% ATK AoE", status: "blind", duration_fixed: 5 }
+    ] },
   ],
 };
 
@@ -98,6 +125,61 @@ const TYPE_CONFIG = {
   defense: { icon: "🛡️", color: "#42a5f5" },
   utility: { icon: "⚙️", color: "#66bb6a" },
 };
+
+// Derive target (self/enemy/both) from skill data + description patterns
+function getTargetInfo(skill) {
+  const type = skill.type;
+  const tc = skill.target_count || "";
+  const descs = skill.effects.map(e => e.description.toLowerCase()).join(" ");
+
+  // Damage skills always target enemy
+  if (type === "damage") {
+    const aoe = tc === "aoe" || tc === "chain_aoe";
+    const spread = tc === "random";
+    return {
+      who: "enemy",
+      whoLabel: "ENEMY",
+      whoIcon: "👾",
+      whoColor: "#ef5350",
+      aoe: aoe || spread,
+      aoeLabel: aoe ? "AOE" : spread ? "RANDOM" : tc === "chain_aoe" ? "CHAIN" : "SINGLE",
+    };
+  }
+
+  // Defense skills — check if they target enemy path/aoe (wall skills) or self
+  if (type === "defense") {
+    const targetsEnemy = descs.includes("attacker") || descs.includes("repel") || descs.includes("wall") || descs.includes("enemy") || tc === "aoe" || tc === "enemy_path";
+    const targetsSelf = descs.includes("self") || descs.includes("shield") || descs.includes("reduction") || descs.includes("reflect") || descs.includes("barrier") || descs.includes("armor") || descs.includes("veil");
+    const both = targetsEnemy && targetsSelf;
+    return {
+      who: both ? "both" : targetsEnemy && !targetsSelf ? "enemy" : "self",
+      whoLabel: both ? "SELF + ENEMY" : targetsEnemy && !targetsSelf ? "ENEMY" : "SELF",
+      whoIcon: both ? "🔄" : targetsEnemy && !targetsSelf ? "👾" : "🧊",
+      whoColor: both ? "#ffa726" : targetsEnemy && !targetsSelf ? "#ef5350" : "#42a5f5",
+      aoe: tc === "aoe" || tc === "enemy_path",
+      aoeLabel: tc === "aoe" ? "AOE" : tc === "enemy_path" ? "PATH" : "SINGLE",
+    };
+  }
+
+  // Utility skills — check if buff (self) or debuff (enemy) or both
+  if (type === "utility") {
+    const debuffWords = ["debuff","reduction","enemy","target","confuse","dominate","shatter","distort","atk reduction","aspd reduction","def reduction","collapse","mind break"];
+    const buffWords = ["boost","heal","aspd boost","atk boost","def boost","crit","recovery","divine","aura","surge","rage","flow","overcharge","embrace","resolve"];
+    const hasDebuff = debuffWords.some(w => descs.includes(w));
+    const hasBuff = buffWords.some(w => descs.includes(w));
+    const both = hasDebuff && hasBuff;
+    return {
+      who: both ? "both" : hasDebuff ? "enemy" : "self",
+      whoLabel: both ? "SELF + ENEMY" : hasDebuff ? "ENEMY" : "SELF",
+      whoIcon: both ? "🔄" : hasDebuff ? "👾" : "🧊",
+      whoColor: both ? "#ffa726" : hasDebuff ? "#ef5350" : "#66bb6a",
+      aoe: tc === "aoe",
+      aoeLabel: tc === "aoe" ? "AOE" : "SINGLE",
+    };
+  }
+
+  return { who: "self", whoLabel: "SELF", whoIcon: "🧊", whoColor: "#aaa", aoe: false, aoeLabel: "SINGLE" };
+}
 
 function calcAtLevel(base, scaling, level) {
   return base + scaling * (level - 1);
@@ -141,6 +223,7 @@ export default function SkillViewer() {
   const rCfg = skill ? RARITY_CONFIG[skill.rarity] : RARITY_CONFIG.common;
 
   const cooldown = skill ? calcCooldown(skill.cooldown_base, skill.cooldown_scaling, level) : 0;
+  const targetInfo = skill ? getTargetInfo(skill) : null;
   const affinityPerUse = skill
     ? { common: 0.2, rare: 0.3, epic: 0.5, legendary: 1.0 }[skill.rarity]
     : 0;
@@ -385,20 +468,29 @@ export default function SkillViewer() {
               </button>
             ))}
           </div>
-          {filtered.map(sk => (
-            <div key={sk.id} style={styles.skillCard(sk)}
-              onClick={() => setSelectedSkillId(sk.id)}>
-              <div style={{ ...styles.skillCardName, color: selectedSkillId === sk.id ? RARITY_CONFIG[sk.rarity].color : "#ccc" }}>
-                {sk.name}
+          {filtered.map(sk => {
+            const ti = getTargetInfo(sk);
+            return (
+              <div key={sk.id} style={styles.skillCard(sk)}
+                onClick={() => setSelectedSkillId(sk.id)}>
+                <div style={{ ...styles.skillCardName, color: selectedSkillId === sk.id ? RARITY_CONFIG[sk.rarity].color : "#ccc" }}>
+                  {sk.name}
+                </div>
+                <div style={styles.skillCardMeta}>
+                  <div style={styles.rarityDot(sk.rarity)} />
+                  <span style={{ fontSize: "9px", color: "#555", letterSpacing: "1px" }}>
+                    {TYPE_CONFIG[sk.type]?.icon}
+                  </span>
+                  <span style={{ fontSize: "9px", color: ti.whoColor, letterSpacing: "0.5px" }}>
+                    {ti.whoIcon} {ti.whoLabel}
+                  </span>
+                  <span style={{ fontSize: "8px", color: "#444" }}>
+                    {ti.aoeLabel}
+                  </span>
+                </div>
               </div>
-              <div style={styles.skillCardMeta}>
-                <div style={styles.rarityDot(sk.rarity)} />
-                <span style={{ fontSize: "9px", color: "#555", letterSpacing: "1px" }}>
-                  {TYPE_CONFIG[sk.type]?.icon} {sk.target_count?.toUpperCase()}
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Detail Panel */}
@@ -411,7 +503,20 @@ export default function SkillViewer() {
               <div style={styles.badgeRow}>
                 <span style={styles.badge(rCfg.color)}>{rCfg.label}</span>
                 <span style={styles.badge(TYPE_CONFIG[skill.type].color)}>{TYPE_CONFIG[skill.type].icon} {skill.type.toUpperCase()}</span>
-                <span style={styles.badge("#555")}>{skill.target_count?.toUpperCase()}</span>
+                {targetInfo && (
+                  <>
+                    <span style={{
+                      ...styles.badge(targetInfo.whoColor),
+                      background: `${targetInfo.whoColor}18`,
+                      fontWeight: "bold",
+                    }}>
+                      {targetInfo.whoIcon} {targetInfo.whoLabel}
+                    </span>
+                    <span style={styles.badge("#556070")}>
+                      {targetInfo.aoeLabel}
+                    </span>
+                  </>
+                )}
                 <span style={styles.badge(elCfg.color)}>{elCfg.icon} {selectedElement.toUpperCase()}</span>
               </div>
             </div>
@@ -451,56 +556,246 @@ export default function SkillViewer() {
               <div style={styles.statValue("#66bb6a")}>{Math.floor(30 / cooldown)}</div>
               <div style={styles.statSub}>≈ {(Math.floor(30 / cooldown) * affinityPerUse).toFixed(1)} affinity/battle</div>
             </div>
-            <div style={styles.statBox}>
-              <div style={styles.statLabel}>ID</div>
-              <div style={{ fontSize: 10, color: "#444", wordBreak: "break-all", marginTop: 2 }}>{skill.id}</div>
-            </div>
+            {targetInfo && (
+              <div style={{
+                ...styles.statBox,
+                border: `1px solid ${targetInfo.whoColor}44`,
+                background: `${targetInfo.whoColor}0a`,
+              }}>
+                <div style={styles.statLabel}>Target</div>
+                <div style={{ fontSize: "15px", fontWeight: "bold", color: targetInfo.whoColor, marginBottom: "3px" }}>
+                  {targetInfo.whoIcon} {targetInfo.whoLabel}
+                </div>
+                <div style={{ fontSize: "10px", color: "#556", letterSpacing: "1px" }}>
+                  {targetInfo.aoeLabel}
+                  {skill.type === "defense" && targetInfo.who === "both" && (
+                    <span style={{ display: "block", fontSize: "8px", color: "#445", marginTop: "2px" }}>
+                      buff self · counter enemy
+                    </span>
+                  )}
+                  {skill.type === "utility" && targetInfo.who === "both" && (
+                    <span style={{ display: "block", fontSize: "8px", color: "#445", marginTop: "2px" }}>
+                      buff self · debuff enemy
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{ fontSize: "9px", color: "#333", marginBottom: "12px", letterSpacing: "0.5px" }}>
+            ID: {skill.id}
           </div>
 
-          {/* Effects */}
+          {/* Effects — Opsi B: single effect = inline, multi = table */}
           <div style={styles.effectsSection}>
             <div style={styles.effectLabel}>Effects</div>
-            {skill.effects.map((eff, i) => {
+            {(() => {
+              const totalEffects = skill.effects.length;
+              const isMulti = totalEffects > 1;
+
+              // Group effects by trigger for multi-effect table view
+              if (isMulti) {
+                // Collect all trigger groups
+                const groups = {};
+                skill.effects.forEach((eff) => {
+                  const key = eff.trigger;
+                  if (!groups[key]) groups[key] = [];
+                  groups[key].push(eff);
+                });
+
+                return Object.entries(groups).map(([trigger, effs], gi) => {
+                  const locked = !isUnlocked(trigger, level);
+                  const triggerLabel = trigger.replace(/_/g, " ").toUpperCase();
+
+                  return (
+                    <div key={gi} style={{ ...styles.effectRow(locked), padding: "10px 12px" }}>
+                      {/* Trigger header */}
+                      <div style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        marginBottom: 8,
+                        paddingBottom: 6,
+                        borderBottom: `1px solid ${locked ? "#1a1a1a" : "#1e2530"}`,
+                      }}>
+                        <span style={{ fontSize: 8, letterSpacing: "1.5px", color: locked ? "#333" : elCfg.color, textTransform: "uppercase" }}>
+                          {locked ? "🔒" : "◆"} {triggerLabel}
+                        </span>
+                        {locked && (
+                          <span style={{ fontSize: 8, color: "#444", letterSpacing: "1px" }}>
+                            {trigger === "unlock_level_4" ? "UNLOCK LV 4" : trigger === "unlock_level_5" ? "UNLOCK LV 5" : trigger === "unlock_level_8" ? "UNLOCK LV 8" : ""}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Sub-effects table rows */}
+                      <div style={{
+                        background: "#080b10",
+                        border: `1px solid ${locked ? "#111" : "#1a2030"}`,
+                        borderRadius: 5,
+                        overflow: "hidden",
+                      }}>
+                        {effs.map((eff, j) => {
+                          // Handle explicit sub_effects (Psychic Collapse / Divine Ascension style)
+                          if (eff.sub_effects && eff.sub_effects.length > 0) {
+                            const dynDur = eff.duration_base != null
+                              ? (eff.duration_base + eff.duration_scaling * (level - 1)).toFixed(1)
+                              : null;
+                            return (
+                              <div key={j}>
+                                {dynDur && (
+                                  <div style={{
+                                    padding: "5px 10px",
+                                    background: "#0a0d14",
+                                    borderBottom: "1px solid #111820",
+                                    fontSize: 10,
+                                    color: "#ffa726",
+                                    display: "flex", justifyContent: "space-between",
+                                  }}>
+                                    <span style={{ color: "#556" }}>Duration</span>
+                                    <span>⏱ {dynDur}s <span style={{ fontSize: 8, color: "#444" }}>({eff.duration_base}+{eff.duration_scaling}/lv)</span></span>
+                                  </div>
+                                )}
+                                {eff.sub_effects.map((sub, k) => {
+                                  const subVal = sub.fixed || sub.special ? null : calcAtLevel(sub.base_value, sub.scaling_per_level, level);
+                                  const isNeg = sub.base_value < 0;
+                                  return (
+                                    <div key={k} style={{
+                                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                                      padding: "5px 10px",
+                                      borderBottom: k < eff.sub_effects.length - 1 ? "1px solid #111820" : "none",
+                                      background: k % 2 === 0 ? "transparent" : "#0a0d14",
+                                    }}>
+                                      <span style={{ fontSize: 10, color: "#667" }}>{sub.label}</span>
+                                      <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                                        {subVal != null && (
+                                          <span style={{ fontSize: 12, fontWeight: "bold", color: isNeg ? "#ef5350" : elCfg.color }}>
+                                            {isNeg ? "" : "+"}{subVal.toFixed(1)}
+                                            <span style={{ fontSize: 9, color: "#555", marginLeft: 2 }}>{sub.unit}</span>
+                                          </span>
+                                        )}
+                                        {sub.fixed && (
+                                          <span style={{ fontSize: 11, fontWeight: "bold", color: "#ef9a9a" }}>
+                                            {Math.abs(sub.base_value)}%
+                                            <span style={{ fontSize: 9, color: "#555", marginLeft: 2 }}>{sub.unit}</span>
+                                          </span>
+                                        )}
+                                        {sub.special && (
+                                          <span style={{ fontSize: 8, color: "#ffa726", border: "1px solid #ffa72633", padding: "1px 5px", borderRadius: 3 }}>
+                                            {sub.unit}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          }
+
+                          // Normal effect row in table
+                          const calc = getEffectDisplay(eff, level);
+                          const isNeg = eff.base_value < 0;
+                          const val = calc ? calcAtLevel(eff.base_value, eff.scaling_per_level, level) : null;
+                          const hits = eff.hits || 1;
+                          const total = val != null ? Math.abs(val) * hits : null;
+                          const dynDur = eff.duration_base != null
+                            ? (eff.duration_base + eff.duration_scaling * (level - 1)).toFixed(1)
+                            : null;
+
+                          return (
+                            <div key={j} style={{
+                              display: "flex", justifyContent: "space-between", alignItems: "center",
+                              padding: "6px 10px",
+                              borderBottom: j < effs.length - 1 ? "1px solid #111820" : "none",
+                              background: j % 2 === 0 ? "transparent" : "#0a0d14",
+                              flexWrap: "wrap", gap: 4,
+                            }}>
+                              {/* Left: description */}
+                              <span style={{ fontSize: 10, color: "#667", flex: "1 1 120px" }}>
+                                {eff.description}
+                                {eff.status && (
+                                  <span style={{ marginLeft: 5, fontSize: 8, color: "#555", border: "1px solid #2a2a2a", padding: "0 4px", borderRadius: 2 }}>
+                                    {eff.status.toUpperCase()}
+                                  </span>
+                                )}
+                              </span>
+
+                              {/* Right: value */}
+                              <div style={{ display: "flex", gap: 5, alignItems: "baseline", justifyContent: "flex-end" }}>
+                                {val != null && eff.base_value !== 0 && (
+                                  <span style={{ fontSize: 12, fontWeight: "bold", color: isNeg ? "#ef5350" : elCfg.color, whiteSpace: "nowrap" }}>
+                                    {isNeg ? "" : "+"}{val.toFixed(1)}
+                                    <span style={{ fontSize: 9, color: "#555", marginLeft: 2 }}>{eff.unit}</span>
+                                  </span>
+                                )}
+                                {hits > 1 && total != null && (
+                                  <span style={{ fontSize: 9, color: "#666", whiteSpace: "nowrap" }}>
+                                    ×{hits} = <span style={{ color: elCfg.color, fontWeight: "bold" }}>{total.toFixed(0)}%</span>
+                                  </span>
+                                )}
+                                {eff.duration_fixed && (
+                                  <span style={{ fontSize: 9, color: "#445", whiteSpace: "nowrap" }}>• {eff.duration_fixed}s</span>
+                                )}
+                                {dynDur && (
+                                  <span style={{ fontSize: 9, color: "#ffa726", whiteSpace: "nowrap" }}>⏱{dynDur}s</span>
+                                )}
+                                {val == null && eff.base_value === 0 && !eff.sub_effects && (
+                                  <span style={{ fontSize: 9, color: "#ffa726", border: "1px solid #ffa72633", padding: "1px 5px", borderRadius: 3 }}>
+                                    special
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                });
+              }
+
+              // SINGLE EFFECT — inline compact (Opsi B)
+              const eff = skill.effects[0];
               const locked = !isUnlocked(eff.trigger, level);
               const calc = getEffectDisplay(eff, level);
+              const dynDur = eff.duration_base != null
+                ? (eff.duration_base + eff.duration_scaling * (level - 1)).toFixed(1)
+                : null;
+
               return (
-                <div key={i} style={styles.effectRow(locked)}>
+                <div style={styles.effectRow(locked)}>
                   <div style={styles.triggerTag(locked)}>
                     {locked ? `🔒 ${eff.trigger.replace(/_/g," ")}` : `◆ ${eff.trigger.replace(/_/g," ")}`}
                   </div>
                   <div style={styles.effectDesc}>{eff.description}</div>
                   {calc && (
-                    <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+                    <div style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap", marginTop: 4 }}>
                       <span style={{ ...styles.effectVal, color: eff.base_value < 0 ? "#ef5350" : elCfg.color }}>
-                        {eff.base_value < 0 ? "" : "+"}{calc.val.toFixed(1)}{eff.unit?.replace("% ATK","").replace("% chance","").replace("% reduction","").replace("% DEF","").replace("% ASPD","") || ""}
+                        {eff.base_value < 0 ? "" : "+"}{calc.val.toFixed(1)}
                         <span style={{ fontSize: 10, color: "#555" }}> {eff.unit}</span>
                       </span>
-                      {calc.hits > 1 && (
+                      {(eff.hits || 1) > 1 && (
                         <span style={{ fontSize: 11, color: "#888" }}>
-                          × {calc.hits} hits = <span style={{ color: elCfg.color, fontWeight: "bold" }}>{calc.total.toFixed(0)}% ATK total</span>
+                          ×{eff.hits} = <span style={{ color: elCfg.color, fontWeight: "bold" }}>{calc.total.toFixed(0)}% ATK</span>
                         </span>
                       )}
-                      {eff.duration_fixed && (
-                        <span style={{ fontSize: 10, color: "#444" }}>• {eff.duration_fixed}s</span>
-                      )}
+                      {eff.duration_fixed && <span style={{ fontSize: 10, color: "#444" }}>• {eff.duration_fixed}s</span>}
+                      {dynDur && <span style={{ fontSize: 10, color: "#ffa726" }}>⏱ {dynDur}s</span>}
                       {eff.status && (
-                        <span style={{ fontSize: 9, letterSpacing: 1, color: "#666", border: "1px solid #333", padding: "1px 5px", borderRadius: 2 }}>
+                        <span style={{ fontSize: 9, color: "#666", border: "1px solid #333", padding: "1px 5px", borderRadius: 2 }}>
                           {eff.status.toUpperCase()}
                         </span>
                       )}
                     </div>
                   )}
-                  {!calc && (
-                    <div style={{ fontSize: 12, color: "#666", fontStyle: "italic" }}>Special mechanic</div>
-                  )}
+                  {!calc && <div style={{ fontSize: 11, color: "#555", fontStyle: "italic", marginTop: 4 }}>Special mechanic</div>}
                   {eff.scaling_per_level !== 0 && (
-                    <div style={{ fontSize: 9, color: "#444", marginTop: 4 }}>
-                      {eff.base_value < 0 ? "" : "+"}{eff.base_value} base · {eff.scaling_per_level > 0 ? "+" : ""}{eff.scaling_per_level}/level
+                    <div style={{ fontSize: 9, color: "#333", marginTop: 4 }}>
+                      {eff.base_value < 0 ? "" : "+"}{eff.base_value} base · {eff.scaling_per_level > 0 ? "+" : ""}{eff.scaling_per_level}/lv
                     </div>
                   )}
                 </div>
               );
-            })}
+            })()}
           </div>
         </div>
       </div>
